@@ -10,7 +10,7 @@ type buttonProps = {
 export default function Button(props: buttonProps) {
     return (
         <View style={[styles.container,props.style]}>
-            <Pressable onPress={props.onPress} >
+            <Pressable onPress={props.onPress} style={{width:"100%",alignItems:"center",height:"100%",justifyContent:"center"}}>
                 <Text style={{color:"white"}}>{props.texto}</Text>
             </Pressable>
         </View>

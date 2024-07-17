@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, KeyboardAvoidingView, ScrollView, Image, TextInput } from "react-native";
+import CheckBox from 'expo-checkbox'
+import { View, Text, StyleSheet, KeyboardAvoidingView, ScrollView, Image, TextInput, } from "react-native";
 import PokedexBox from "../components/redBox";
 import PokemonScreen from "../components/pokemonScreen";
 import PokemonService from "../services/pokemonService";
@@ -9,6 +10,7 @@ export default function Pokedex() {
     const [pokemonName, setPokemonName] = useState('bulbasaur');
     const [pokemonData, setPokemonData] = useState<any | null>(null);
     const [pokemonID, setPokemonID] = useState(1);
+    const [isShiny, setShiny] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const pokeService = new PokemonService();
 
@@ -26,9 +28,10 @@ export default function Pokedex() {
     }
     const nextPokemon = async () =>{
         try{
-            setPokemonID(pokemonID+1)
-            const data = await pokeService.fetchPokemon(pokemonID)
+            const newId = pokemonID+1
+            const data = await pokeService.fetchPokemon(newId)
             setPokemonData(data);
+            setPokemonID(newId)
             setPokemonName(data.name)
         }
         catch{
@@ -38,9 +41,10 @@ export default function Pokedex() {
     }
     const perviousPokemon = async () =>{
         try{
-            setPokemonID(pokemonID-1)
-            const data = await pokeService.fetchPokemon(pokemonID)
+            const newId = pokemonID-1
+            const data = await pokeService.fetchPokemon(newId)
             setPokemonData(data);
+            setPokemonID(newId)
             setPokemonName(data.name)
         }
         catch{
@@ -57,10 +61,12 @@ export default function Pokedex() {
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 <PokedexBox style={{ paddingTop: "20%" }}>
                     <PokemonScreen>
-                        {pokemonData && pokemonData.sprites && pokemonData.sprites.front_default ? (
-                            <Image source={{ uri: pokemonData.sprites.front_default }} style={styles.image} />
+                        { pokemonData ? (
+                            isShiny?<Image source={{ uri: pokemonData.sprites.front_shiny }} style={styles.image} />:
+                            <Image source={{ uri: pokemonData.sprites.front_default}} style={styles.image} />
+                            
                         ) : (
-                            <Text>{error}</Text>
+                            <Text>Pokemon nao encontrado</Text>
                         )}
                     </PokemonScreen>
                     {pokemonData ? (
@@ -78,6 +84,11 @@ export default function Pokedex() {
                         <Button texto="avançar" onPress={nextPokemon}/>
                     </View>
                     <Button texto="buscar" onPress={handleSearch} />
+                    <View style={{flexDirection:"row", alignItems:"center"}}>
+                        <CheckBox value={isShiny} onValueChange={setShiny} style={styles.checkbox}  />
+                        <Text>Shiny</Text>
+                    </View>
+                    
                     
                 </PokedexBox>
             </ScrollView>
@@ -127,5 +138,8 @@ const styles = StyleSheet.create({
         backgroundColor:"white",
         width: '40%',   
         borderRadius:15
+    },
+    checkbox: {
+        margin:8
     }
 });
